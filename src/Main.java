@@ -1,48 +1,66 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class Main {
 	public static void main(String args[]) {
+		String code;
 		try {
-			FileReader fr = new FileReader(new File("src/HelloWorld.java"));
-			BufferedReader br = new BufferedReader(fr);
-			StringBuilder sb = new StringBuilder();
-			String buf;
-			while((buf = br.readLine()) != null) {
-				sb.append(buf);
-				sb.append('\n');
-			}
-			// System.out.println(sb.toString());
-			br.close();
-			// Create AST Parser
-			ASTParser parser = ASTParser.newParser(AST.JLS8);
-			parser.setSource(sb.toString().toCharArray());
-			CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
-
-			MethodFindVisitor mfv = new MethodFindVisitor("main");
-			unit.accept(mfv);
-			MethodDeclaration method = mfv.getFoundMethod();
-			if(method != null) {
-				System.out.printf("‰Â‹«“™  =%s%n", method.modifiers());
-				System.out.printf("–ß‚èŒ^    =%s%n", method.getReturnType2());
-				System.out.printf("ƒƒ\ƒbƒh–¼=%s%n", method.getName().getIdentifier());
-				System.out.printf("ˆø”      =%s%n", method.parameters());
-				System.out.printf("–{‘Ì      =%s%n", method.getBody());
-			}
-			
-			VariableFindVisitor vfv = new VariableFindVisitor("hello");
-			unit.accept(vfv);
-			VariableDeclaration variable = vfv.getFoundVariable();
-			if(variable != null) {
-				System.out.printf("•Ï”–¼   =%s%n", variable.getName().getIdentifier());
-				System.out.printf("ŠJns   =%s%n", unit.getLineNumber(variable.getStartPosition()));
-				System.out.printf("‰Šú‰»q  =%s%n", variable.getInitializer());
-			}
-
+			code = readSourceCode("src/Main.java");
 		} catch(IOException e) {
 			System.out.println(e.toString());
+			return;
 		}
+
+		// Create AST Parser
+		ASTParser parser = ASTParser.newParser(AST.JLS8);
+		parser.setSource(code.toCharArray());
+		CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
+
+		MyVisitor visitor = new MyVisitor();
+		unit.accept(visitor);
+
+		for(MethodDeclaration method : visitor.getMethodList()) {
+			if(method != null) {
+				System.out.printf("å¯è¦–æ€§ç­‰  =%s%n", method.modifiers());
+				System.out.printf("æˆ»ã‚Šå‹    =%s%n", method.getReturnType2());
+				System.out.printf("ãƒ¡ã‚½ãƒƒãƒ‰å=%s%n", method.getName().getIdentifier());
+				System.out.printf("å¼•æ•°      =%s%n", method.parameters());
+				System.out.printf("æœ¬ä½“      =%s%n", method.getBody());
+			}
+		}
+
+		for(VariableDeclarationFragment variable : visitor.getVariableList()) {
+			if(variable != null) {
+				System.out.printf("å¤‰æ•°å   =%s%n", variable.getName().getIdentifier());
+				System.out.printf("é–‹å§‹è¡Œ   =%s%n", unit.getLineNumber(variable.getStartPosition()));
+				System.out.printf("åˆæœŸåŒ–å­  =%s%n", variable.getInitializer());
+				System.out.println();
+			}
+		}
+
+		System.out.println("Number of block: " + visitor.getBlockList().size());
+	}
+
+	private static String readSourceCode(String path) throws IOException {
+		FileReader fr = new FileReader(new File(path));
+		BufferedReader br = new BufferedReader(fr);
+		StringBuilder sb = new StringBuilder();
+		String buf;
+		while((buf = br.readLine()) != null) {
+			sb.append(buf);
+			sb.append('\n');
+		}
+
+		br.close();
+		return sb.toString();
 	}
 }
