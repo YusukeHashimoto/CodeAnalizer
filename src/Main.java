@@ -2,6 +2,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.dom.AST;
@@ -28,6 +30,8 @@ public class Main {
 		MyVisitor visitor = new MyVisitor();
 		unit.accept(visitor);
 
+		MyParser myParser = new MyParser(code);
+
 		for(MethodDeclaration method : visitor.getMethodList()) {
 			if(method != null) {
 				System.out.printf("可視性等  =%s%n", method.modifiers());
@@ -43,11 +47,14 @@ public class Main {
 				System.out.printf("変数名   =%s%n", variable.getName().getIdentifier());
 				System.out.printf("開始行   =%s%n", unit.getLineNumber(variable.getStartPosition()));
 				System.out.printf("初期化子  =%s%n", variable.getInitializer());
+				System.out.printf("寿命 =%s%n", myParser.lifeSpanOf(variable));
 				System.out.println();
 			}
 		}
 
 		System.out.println("Number of block: " + visitor.getBlockList().size());
+
+		myParser.removeBlankLines(code);
 	}
 
 	private static String readSourceCode(String path) throws IOException {
@@ -62,5 +69,11 @@ public class Main {
 
 		br.close();
 		return sb.toString();
+	}
+
+	private List<String> getSourceCodeList(String path) {
+		List<String> fileList = new ArrayList<>();
+
+		return fileList;
 	}
 }
