@@ -9,7 +9,7 @@ public class MyParser {
 
 	/**
 	 * 変数の寿命を行数で返す <br>
-	 * コメント行や空行も1行として数える<br>
+	 * 空行は読み飛ばすが， コメント行は1行として数える<br>
 	 * エラーがあれば-1を返す
 	 * 
 	 * @param variable
@@ -17,6 +17,7 @@ public class MyParser {
 	 */
 	int lifeSpanOf(VariableDeclarationFragment variable) {
 		int start = variable.getStartPosition();
+		// String code = removeBlankLines(this.code);
 		for(int i = 0, left = 0, right = 0, lines = 0; i < code.length(); i++) {
 			switch(code.charAt(start + i)) {
 			case '{':
@@ -32,5 +33,48 @@ public class MyParser {
 				return lines;
 		}
 		return -1;
+	}
+
+	/**
+	 * 文字列で与えられたコードから空行を削除して返す
+	 * 
+	 * @param code
+	 * @return
+	 */
+	static String removeBlankLines(String code) {
+		return removeMatchedLine(code, "^\\s*$");
+	}
+
+	/**
+	 * 与えられたコードから正規表現regexに一致する行を削除して返す
+	 * 
+	 * @param code
+	 * @param regex
+	 * @return
+	 */
+	static String removeMatchedLine(String code, String regex) {
+		String lines[] = code.split("\n");
+		StringBuilder sb = new StringBuilder();
+
+		for(int i = 0; i < lines.length; i++) {
+			if(!lines[i].matches(regex)) {
+				sb.append(lines[i] + '\n');
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 与えられたコードからコメント行を削除
+	 * 
+	 * @param code
+	 * @return
+	 */
+	static String removeCommentLines(String code) {
+		return removeMatchedLine(code, "^\\s*//.*");
+	}
+
+	static String format(String code) {
+		return removeBlankLines(removeCommentLines(code));
 	}
 }

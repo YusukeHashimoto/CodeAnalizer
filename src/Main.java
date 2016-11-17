@@ -22,7 +22,7 @@ public class Main {
 			return;
 		}
 
-		// Create AST Parser
+		code = MyParser.format(code);
 		ASTParser parser = ASTParser.newParser(AST.JLS8);
 		parser.setSource(code.toCharArray());
 		CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
@@ -54,7 +54,7 @@ public class Main {
 
 		System.out.println("Number of block: " + visitor.getBlockList().size());
 
-		myParser.removeBlankLines(code);
+		System.out.println(code);
 	}
 
 	private static String readSourceCode(String path) throws IOException {
@@ -73,7 +73,9 @@ public class Main {
 
 	private List<String> getSourceCodeList(String path) {
 		List<String> fileList = new ArrayList<>();
-
+		// do something
 		return fileList;
 	}
 }
+
+// this comment means nothing!
