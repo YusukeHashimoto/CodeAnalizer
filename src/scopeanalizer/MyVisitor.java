@@ -1,3 +1,4 @@
+package scopeanalizer;
 import java.util.ArrayList;
 import java.util.List;
 

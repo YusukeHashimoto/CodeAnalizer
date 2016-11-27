@@ -1,20 +1,16 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
+package scopeanalizer;
+import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.*;
 
 public class Main {
 	public static void main(String args[]) {
 		String code;
+		List<String> classList = getSourceCodeList("src/");
+		System.out.println("number of classes in the package: " + classList.size());
 		try {
 			code = readSourceCode("src/Main.java");
 		} catch(IOException e) {
@@ -38,7 +34,7 @@ public class Main {
 				System.out.printf("戻り型    =%s%n", method.getReturnType2());
 				System.out.printf("メソッド名=%s%n", method.getName().getIdentifier());
 				System.out.printf("引数      =%s%n", method.parameters());
-				System.out.printf("本体      =%s%n", method.getBody());
+				//System.out.printf("本体      =%s%n", method.getBody());
 			}
 		}
 
@@ -54,7 +50,7 @@ public class Main {
 
 		System.out.println("Number of block: " + visitor.getBlockList().size());
 
-		System.out.println(code);
+		//System.out.println(code);
 	}
 
 	private static String readSourceCode(String path) throws IOException {
@@ -71,11 +67,7 @@ public class Main {
 		return sb.toString();
 	}
 
-	private List<String> getSourceCodeList(String path) {
-		List<String> fileList = new ArrayList<>();
-		// do something
-		return fileList;
+	private static List<String> getSourceCodeList(String pathToPackage) {
+		return Arrays.asList((new File(pathToPackage)).list());
 	}
 }
-
-// this comment means nothing!

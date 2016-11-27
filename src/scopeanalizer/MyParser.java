@@ -1,3 +1,4 @@
+package scopeanalizer;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class MyParser {
