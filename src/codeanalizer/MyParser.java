@@ -1,4 +1,5 @@
 package codeanalizer;
+
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class MyParser {
@@ -18,7 +19,6 @@ public class MyParser {
 	 */
 	int lifeSpanOf(VariableDeclarationFragment variable) {
 		int start = variable.getStartPosition();
-		// String code = removeBlankLines(this.code);
 		for(int i = 0, left = 0, right = 0, lines = 0; i < code.length(); i++) {
 			switch(code.charAt(start + i)) {
 			case '{':

@@ -1,15 +1,18 @@
 package codeanalizer;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class CodeAnalizer {
-	
+
 	public static void main(String args[]) {
-		new CodeAnalizer().run("src/scopeanalizer/");
+		new CodeAnalizer().run("src/codeanalizer/");
 	}
 
 	public void run(String pathToPackage) {
@@ -20,10 +23,9 @@ public class CodeAnalizer {
 			System.out.println("\n" + className + "\n");
 
 			String code;
-			try {
-				code = FileUtil.readSourceCode(pathToPackage + className);
-			} catch(IOException e) {
-				System.out.println(e.toString());
+			code = FileUtil.readSourceCode(pathToPackage + className);
+
+			if(code == null) {
 				continue;
 			}
 
@@ -38,7 +40,7 @@ public class CodeAnalizer {
 			printVariableDetail(unit, new MyParser(code));
 		}
 	}
-	
+
 	private static void printMethodDetail(CompilationUnit unit) {
 		MyVisitor visitor = new MyVisitor();
 		unit.accept(visitor);
@@ -48,12 +50,13 @@ public class CodeAnalizer {
 				System.out.printf("戻り型    =%s%n", method.getReturnType2());
 				System.out.printf("メソッド名=%s%n", method.getName().getIdentifier());
 				System.out.printf("引数      =%s%n", method.parameters());
-				//System.out.printf("本体      =%s%n", method.getBody());
+				// System.out.printf("本体 =%s%n", method.getBody());
 				System.out.printf("行数 =%s%n", method.properties().get(MyVisitor.LINE_COUNT));
 				System.out.println();
 			}
 		}
 	}
+
 	private static void printVariableDetail(CompilationUnit unit, MyParser parser) {
 		MyVisitor visitor = new MyVisitor();
 		unit.accept(visitor);
@@ -62,10 +65,10 @@ public class CodeAnalizer {
 				System.out.printf("変数名   =%s%n", variable.getName().getIdentifier());
 				System.out.printf("開始行   =%s%n", unit.getLineNumber(variable.getStartPosition()));
 				System.out.printf("初期化子  =%s%n", variable.getInitializer());
-				System.out.printf("寿命 =%s%n", parser.lifeSpanOf(variable));
+				// System.out.printf("寿命 =%s%n", parser.lifeSpanOf(variable));
+				System.out.printf("寿命=%s%n", variable.getProperty(MyVisitor.LIFE_SPAN));
 				System.out.println();
 			}
 		}
 	}
-
 }

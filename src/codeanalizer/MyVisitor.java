@@ -1,14 +1,20 @@
 package codeanalizer;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class MyVisitor extends ASTVisitor {
 	private List<MethodDeclaration> methodList;
 	private List<VariableDeclarationFragment> variableList;
 	private List<Block> blockList;
 	static final String LINE_COUNT = "line";
+	static final String LIFE_SPAN = "life";
+	private MyParser parser;
 
 	public List<MethodDeclaration> getMethodList() {
 		return methodList;
@@ -37,6 +43,9 @@ public class MyVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(VariableDeclarationFragment node) {
+		if(parser == null)
+			parser = new MyParser(node.getRoot().toString());
+		node.setProperty(LIFE_SPAN, parser.lifeSpanOf(node));
 		variableList.add(node);
 		return super.visit(node);
 	}
@@ -46,11 +55,12 @@ public class MyVisitor extends ASTVisitor {
 		blockList.add(node);
 		return super.visit(node);
 	}
-	
+
 	private static int countLines(String code) {
 		int n = 0;
 		for(char c : code.toCharArray()) {
-			if(c == '\n') n++;
+			if(c == '\n')
+				n++;
 		}
 		return n;
 	}
