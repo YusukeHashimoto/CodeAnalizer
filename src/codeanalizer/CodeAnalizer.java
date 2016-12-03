@@ -3,11 +3,7 @@ package codeanalizer;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.*;
 
 public class CodeAnalizer {
 
@@ -37,7 +33,7 @@ public class CodeAnalizer {
 			unit.accept(new MyVisitor());
 
 			printMethodDetail(unit);
-			printVariableDetail(unit, new MyParser(code));
+			printVariableDetail(unit);
 		}
 	}
 
@@ -57,7 +53,7 @@ public class CodeAnalizer {
 		}
 	}
 
-	private static void printVariableDetail(CompilationUnit unit, MyParser parser) {
+	private static void printVariableDetail(CompilationUnit unit) {
 		MyVisitor visitor = new MyVisitor();
 		unit.accept(visitor);
 		for(VariableDeclarationFragment variable : visitor.getVariableList()) {

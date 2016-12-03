@@ -3,10 +3,7 @@ package codeanalizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.*;
 
 public class MyVisitor extends ASTVisitor {
 	private List<MethodDeclaration> methodList;
@@ -15,6 +12,7 @@ public class MyVisitor extends ASTVisitor {
 	static final String LINE_COUNT = "line";
 	static final String LIFE_SPAN = "life";
 	private MyParser parser;
+	private int cyclomaticComplexity = 1;
 
 	public List<MethodDeclaration> getMethodList() {
 		return methodList;
@@ -54,6 +52,59 @@ public class MyVisitor extends ASTVisitor {
 	public boolean visit(Block node) {
 		blockList.add(node);
 		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(IfStatement node) {
+		cyclomaticComplexity++;
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(SwitchCase node) {
+		cyclomaticComplexity++;
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(WhileStatement node) {
+		cyclomaticComplexity++;
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(ForStatement node) {
+		cyclomaticComplexity++;
+		return super.visit(node);
+		
+	}
+		
+	@Override
+	public boolean visit(CatchClause node) {
+		cyclomaticComplexity++;
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(EnhancedForStatement node) {
+		cyclomaticComplexity++;
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(ConditionalExpression node) {
+		cyclomaticComplexity++;
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(DoStatement node) {
+		cyclomaticComplexity++;
+		return super.visit(node);
+	}
+	
+	int totalCyclomaticComplexity() {
+		return cyclomaticComplexity;
 	}
 
 	private static int countLines(String code) {
