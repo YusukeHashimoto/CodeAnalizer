@@ -11,6 +11,7 @@ public class MyVisitor extends ASTVisitor {
 	private List<Block> blockList;
 	static final String LINE_COUNT = "line";
 	static final String LIFE_SPAN = "life";
+	static final String DECLARED_LINE = "declared_line";
 	private MyParser parser;
 	private int cyclomaticComplexity = 1;
 
@@ -41,8 +42,7 @@ public class MyVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(VariableDeclarationFragment node) {
-		if(parser == null)
-			parser = new MyParser(node.getRoot().toString());
+		if(parser == null) parser = new MyParser(node.getRoot().toString());
 		node.setProperty(LIFE_SPAN, parser.lifeSpanOf(node));
 		variableList.add(node);
 		return super.visit(node);
@@ -110,8 +110,7 @@ public class MyVisitor extends ASTVisitor {
 	private static int countLines(String code) {
 		int n = 0;
 		for(char c : code.toCharArray()) {
-			if(c == '\n')
-				n++;
+			if(c == '\n') n++;
 		}
 		return n;
 	}
