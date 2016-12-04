@@ -22,22 +22,22 @@ public class CodeAnalizer {
 		for(String className : classList) {
 			System.out.println("\n" + className + "\n");
 
-			String code;
-			code = FileUtil.readSourceCode(pathToPackage + className);
+			String rawCode = FileUtil.readSourceCode(pathToPackage + className);
 
-			if(code == null) {
-				continue;
-			}
+			if(rawCode == null) continue;
 
-			code = MyParser.format(code);
+			String formattedCode = MyParser.format(rawCode);
+
 			ASTParser parser = ASTParser.newParser(AST.JLS4);
-			parser.setSource(code.toCharArray());
+			parser.setSource(formattedCode.toCharArray());
 			CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
 
 			unit.accept(new MyVisitor());
 
+			setLineNum(unit, rawCode);
+
 			printMethodDetail(unit);
-			printVariableDetail(unit, new MyParser(code));
+			printVariableDetail(unit, new MyParser(formattedCode));
 		}
 	}
 
@@ -63,12 +63,27 @@ public class CodeAnalizer {
 		for(VariableDeclarationFragment variable : visitor.getVariableList()) {
 			if(variable != null) {
 				System.out.printf("変数名   =%s%n", variable.getName().getIdentifier());
-				System.out.printf("開始行   =%s%n", unit.getLineNumber(variable.getStartPosition()));
+				System.out.printf("開始行 =%s%n", variable.getProperty(MyVisitor.DECLARED_LINE));
 				System.out.printf("初期化子  =%s%n", variable.getInitializer());
-				// System.out.printf("寿命 =%s%n", parser.lifeSpanOf(variable));
 				System.out.printf("寿命=%s%n", variable.getProperty(MyVisitor.LIFE_SPAN));
 				System.out.println();
 			}
+		}
+	}
+
+	private void setLineNum(CompilationUnit unit, String source) {
+		MyVisitor visitor = new MyVisitor();
+		unit.accept(visitor);
+		List<VariableDeclarationFragment> varList = visitor.getVariableList();
+
+		ASTParser parser = ASTParser.newParser(AST.JLS4);
+		parser.setSource(source.toCharArray());
+		CompilationUnit unit2 = (CompilationUnit) parser.createAST(new NullProgressMonitor());
+		unit2.accept(visitor);
+
+		for(int i = 0; i < varList.size(); i++) {
+			varList.get(i).setProperty(MyVisitor.DECLARED_LINE,
+					unit2.getLineNumber(visitor.getVariableList().get(i).getStartPosition()));
 		}
 	}
 }

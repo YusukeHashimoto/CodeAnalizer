@@ -13,16 +13,9 @@ public class FileUtil {
 			FileReader fr = new FileReader(new File(path));
 			BufferedReader br = new BufferedReader(fr);
 			StringBuilder sb = new StringBuilder();
-			/*
-					String buf;
-					while((buf = br.readLine()) != null) {
-						sb.append(buf);
-						sb.append('\n');
-					}
-			*/
+
 			for(String buf = br.readLine(); buf != null; buf = br.readLine()) {
-				sb.append(buf);
-				sb.append('\n');
+				sb.append(buf).append('\n');
 			}
 
 			br.close();
