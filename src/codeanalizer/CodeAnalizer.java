@@ -3,7 +3,11 @@ package codeanalizer;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class CodeAnalizer {
 
@@ -28,14 +32,18 @@ public class CodeAnalizer {
 			parser.setSource(formattedCode.toCharArray());
 			CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
 
-			unit.accept(new MyVisitor());
+			MyVisitor visitor = new MyVisitor();
+			visitor.code = formattedCode;
+			unit.accept(visitor);
 
-			setLineNum(unit, rawCode);
+			// setLineNum(visitor, rawCode);
 
 			printMethodDetail(unit);
 			printVariableDetail(unit);
 
-			//System.out.println("Cyclomatic complexity: ");
+			// System.out.println("Cyclomatic complexity: ");
+
+			// System.out.println(visitor.getMethodList());
 		}
 	}
 
@@ -69,9 +77,10 @@ public class CodeAnalizer {
 		}
 	}
 
-	private void setLineNum(CompilationUnit unit, String source) {
-		MyVisitor visitor = new MyVisitor();
-		unit.accept(visitor);
+	private void setLineNum(MyVisitor visitor, String source) {
+		// MyVisitor visitor = new MyVisitor();
+		visitor.code = source;
+		// unit.accept(visitor);
 		List<VariableDeclarationFragment> varList = visitor.getVariableList();
 
 		ASTParser parser = ASTParser.newParser(AST.JLS4);
