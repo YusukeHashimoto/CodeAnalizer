@@ -3,11 +3,7 @@ package codeanalizer;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.*;
 
 public class CodeAnalizer {
 
@@ -32,14 +28,13 @@ public class CodeAnalizer {
 			parser.setSource(formattedCode.toCharArray());
 			CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
 
-			MyVisitor visitor = new MyVisitor();
-			visitor.code = formattedCode;
+			MyVisitor visitor = new MyVisitor(formattedCode);
 			unit.accept(visitor);
 
-			// setLineNum(visitor, rawCode);
+			setLineNum(visitor, rawCode);
 
-			printMethodDetail(unit);
-			printVariableDetail(unit);
+			printMethodDetail(unit, formattedCode);
+			printVariableDetail(unit, formattedCode);
 
 			// System.out.println("Cyclomatic complexity: ");
 
@@ -47,8 +42,8 @@ public class CodeAnalizer {
 		}
 	}
 
-	private static void printMethodDetail(CompilationUnit unit) {
-		MyVisitor visitor = new MyVisitor();
+	private static void printMethodDetail(CompilationUnit unit, String code) {
+		MyVisitor visitor = new MyVisitor(code);
 		unit.accept(visitor);
 		for(MethodDeclaration method : visitor.getMethodList()) {
 			if(method != null) {
@@ -63,8 +58,8 @@ public class CodeAnalizer {
 		}
 	}
 
-	private static void printVariableDetail(CompilationUnit unit) {
-		MyVisitor visitor = new MyVisitor();
+	private static void printVariableDetail(CompilationUnit unit, String code) {
+		MyVisitor visitor = new MyVisitor(code);
 		unit.accept(visitor);
 		for(VariableDeclarationFragment variable : visitor.getVariableList()) {
 			if(variable != null) {
@@ -77,20 +72,18 @@ public class CodeAnalizer {
 		}
 	}
 
-	private void setLineNum(MyVisitor visitor, String source) {
-		// MyVisitor visitor = new MyVisitor();
-		visitor.code = source;
-		// unit.accept(visitor);
-		List<VariableDeclarationFragment> varList = visitor.getVariableList();
+	private void setLineNum(MyVisitor formattedVisitor, String code) {
+		MyVisitor visitor = new MyVisitor(code);
+		List<VariableDeclarationFragment> varList = formattedVisitor.getVariableList();
 
 		ASTParser parser = ASTParser.newParser(AST.JLS4);
-		parser.setSource(source.toCharArray());
-		CompilationUnit unit2 = (CompilationUnit) parser.createAST(new NullProgressMonitor());
-		unit2.accept(visitor);
+		parser.setSource(code.toCharArray());
+		CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
+		unit.accept(visitor);
 
 		for(int i = 0; i < varList.size(); i++) {
 			varList.get(i).setProperty(MyVisitor.DECLARED_LINE,
-					unit2.getLineNumber(visitor.getVariableList().get(i).getStartPosition()));
+					unit.getLineNumber(visitor.getVariableList().get(i).getStartPosition()));
 		}
 	}
 }

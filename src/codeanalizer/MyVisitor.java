@@ -3,18 +3,7 @@ package codeanalizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CatchClause;
-import org.eclipse.jdt.core.dom.ConditionalExpression;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.SwitchCase;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.jdt.core.dom.*;
 
 public class MyVisitor extends ASTVisitor {
 	private List<MethodDeclaration> methodList;
@@ -25,7 +14,7 @@ public class MyVisitor extends ASTVisitor {
 	static final String DECLARED_LINE = "declared_line";
 	private MyParser parser;
 	private int cyclomaticComplexity = 1;
-	static String code;
+	private String code;
 
 	public List<MethodDeclaration> getMethodList() {
 		return methodList;
@@ -39,10 +28,11 @@ public class MyVisitor extends ASTVisitor {
 		return blockList;
 	}
 
-	MyVisitor() {
+	MyVisitor(String code) {
 		methodList = new ArrayList<>();
 		variableList = new ArrayList<>();
 		blockList = new ArrayList<>();
+		this.code = code;
 	}
 
 	@Override

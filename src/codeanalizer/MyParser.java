@@ -19,14 +19,7 @@ public class MyParser {
 	 */
 	int lifeSpanOf(VariableDeclarationFragment variable) {
 		int start = variable.getStartPosition();
-		boolean b = false;
-		if(variable.getName().getIdentifier().equals("n")) {
-			// System.err.println(code);
-			// System.err.println(variable);
-			b = true;
-		}
 		for(int i = 0, open = 0, close = 0, lines = 0; i < code.length(); i++) {
-			// if(b) System.err.println(code.charAt(start + i));
 			switch(code.charAt(start + i)) {
 			case '{':
 				open++;
