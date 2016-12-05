@@ -36,9 +36,7 @@ public class CodeAnalizer {
 			printMethodDetail(unit, formattedCode);
 			printVariableDetail(unit, formattedCode);
 
-			// System.out.println("Cyclomatic complexity: ");
-
-			// System.out.println(visitor.getMethodList());
+			System.out.println("Cyclomatic complexity: " + visitor.totalCyclomaticComplexity());
 		}
 	}
 
@@ -53,6 +51,7 @@ public class CodeAnalizer {
 				System.out.printf("引数      =%s%n", method.parameters());
 				// System.out.printf("本体 =%s%n", method.getBody());
 				System.out.printf("行数 =%s%n", method.properties().get(MyVisitor.LINE_COUNT));
+				System.out.printf("McCabe=%s%n", method.properties().get(MyVisitor.CYCLOMATIC_COMPLEXITY));
 				System.out.println();
 			}
 		}
@@ -72,12 +71,12 @@ public class CodeAnalizer {
 		}
 	}
 
-	private void setLineNum(MyVisitor formattedVisitor, String code) {
-		MyVisitor visitor = new MyVisitor(code);
+	private void setLineNum(MyVisitor formattedVisitor, String rawCode) {
+		MyVisitor visitor = new MyVisitor(rawCode);
 		List<VariableDeclarationFragment> varList = formattedVisitor.getVariableList();
 
 		ASTParser parser = ASTParser.newParser(AST.JLS4);
-		parser.setSource(code.toCharArray());
+		parser.setSource(rawCode.toCharArray());
 		CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
 		unit.accept(visitor);
 
