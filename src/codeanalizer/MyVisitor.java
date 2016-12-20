@@ -13,6 +13,8 @@ public class MyVisitor extends ASTVisitor {
 	static final String LIFE_SPAN = "life";
 	static final String DECLARED_LINE = "declared_line";
 	static final String CYCLOMATIC_COMPLEXITY = "mccabe";
+	static final String LOCAL_VARIABLE = "local";
+	static final String DEFINITION_PLACE = "def_place";
 	private MyParser parser;
 	private int cyclomaticComplexity = 1;
 
@@ -46,6 +48,7 @@ public class MyVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(VariableDeclarationFragment node) {
 		node.setProperty(LIFE_SPAN, parser.lifeSpanOf(node));
+		node.setProperty(DEFINITION_PLACE, definitionPlace(node));
 		variableList.add(node);
 		return super.visit(node);
 	}
@@ -121,6 +124,7 @@ public class MyVisitor extends ASTVisitor {
 		ASTNode parent = node.getParent();
 		while(!(parent instanceof MethodDeclaration)) {
 			parent = parent.getParent();
+			if(parent == null) return null;
 		}
 		return (MethodDeclaration) parent;
 	}
@@ -135,5 +139,18 @@ public class MyVisitor extends ASTVisitor {
 			if(c == '\n') n++;
 		}
 		return n;
+	}
+	
+	private boolean isLocalVariable(ASTNode node) {
+		return parentMethodOf(node) != null;
+	}
+	
+	private ASTNode definitionPlace(ASTNode node) {
+		ASTNode parent = node.getParent();
+		if(parent == null) return node;
+		while(!(parent instanceof MethodDeclaration) && !(parent instanceof CompilationUnit)) {
+			parent = parent.getParent();
+		}
+		return parent;
 	}
 }

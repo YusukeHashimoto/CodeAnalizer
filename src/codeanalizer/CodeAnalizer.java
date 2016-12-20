@@ -66,6 +66,8 @@ public class CodeAnalizer {
 				System.out.printf("開始行 =%s%n", variable.getProperty(MyVisitor.DECLARED_LINE));
 				System.out.printf("初期化子  =%s%n", variable.getInitializer());
 				System.out.printf("寿命=%s%n", variable.getProperty(MyVisitor.LIFE_SPAN));
+				System.out.println(variable.getProperty(MyVisitor.DEFINITION_PLACE) instanceof MethodDeclaration
+						? "ローカル変数" : "フィールド変数");
 				System.out.println();
 			}
 		}
@@ -85,4 +87,13 @@ public class CodeAnalizer {
 					unit.getLineNumber(visitor.getVariableList().get(i).getStartPosition()));
 		}
 	}
+	
+	void showWarning(CompilationUnit unit, String code) {
+		MyVisitor visitor = new MyVisitor(code);
+		unit.accept(visitor);
+		for(VariableDeclarationFragment variable : visitor.getVariableList()) {
+			
+		}
+	}
+
 }
