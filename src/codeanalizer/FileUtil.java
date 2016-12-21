@@ -1,9 +1,6 @@
 package codeanalizer;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,9 +11,7 @@ public class FileUtil {
 			BufferedReader br = new BufferedReader(fr);
 			StringBuilder sb = new StringBuilder();
 
-			for(String buf = br.readLine(); buf != null; buf = br.readLine()) {
-				sb.append(buf).append('\n');
-			}
+			br.lines().forEach(s -> sb.append(s).append('\n'));
 
 			br.close();
 			return sb.toString();

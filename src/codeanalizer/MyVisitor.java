@@ -140,11 +140,7 @@ public class MyVisitor extends ASTVisitor {
 		}
 		return n;
 	}
-	
-	private boolean isLocalVariable(ASTNode node) {
-		return parentMethodOf(node) != null;
-	}
-	
+
 	private ASTNode definitionPlace(ASTNode node) {
 		ASTNode parent = node.getParent();
 		if(parent == null) return node;
