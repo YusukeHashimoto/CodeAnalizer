@@ -8,7 +8,8 @@ import org.eclipse.jdt.core.dom.*;
 public class CodeAnalizer {
 
 	public static void main(String args[]) {
-		new CodeAnalizer().run("src/codeanalizer/");
+		new CodeAnalizer().run("res/");
+		//new CodeAnalizer().run("src/codeanalizer/");
 	}
 
 	public void run(String pathToPackage) {
@@ -17,10 +18,13 @@ public class CodeAnalizer {
 
 		for(String className : classList) {
 			System.out.println("\n" + className + "\n");
-
+			run(pathToPackage, className);
+		}
+	}
+	public void run(String pathToPackage, String className) {
 			String rawCode = FileUtil.readSourceCode(pathToPackage + className);
 
-			if(rawCode == null) continue;
+			if(rawCode == null) return;
 
 			String formattedCode = MyParser.format(rawCode);
 
@@ -32,13 +36,16 @@ public class CodeAnalizer {
 			unit.accept(visitor);
 
 			setLineNum(visitor, rawCode);
-
+			/*
 			printMethodDetail(unit, formattedCode);
 			printVariableDetail(unit, formattedCode);
-
-			System.out.println("Cyclomatic complexity: " + visitor.totalCyclomaticComplexity());
+			 */
+			
+			showWarning(unit, formattedCode);
+			
+			//System.out.println("Cyclomatic complexity: " + visitor.totalCyclomaticComplexity());
 		}
-	}
+	
 
 	private static void printMethodDetail(CompilationUnit unit, String code) {
 		MyVisitor visitor = new MyVisitor(code);
@@ -92,8 +99,21 @@ public class CodeAnalizer {
 		MyVisitor visitor = new MyVisitor(code);
 		unit.accept(visitor);
 		for(VariableDeclarationFragment variable : visitor.getVariableList()) {
-			
+			int lifespan = (int)variable.getProperty(MyVisitor.LIFE_SPAN);
+			if(lifespan > 15 && variable.getProperty(MyVisitor.DEFINITION_PLACE) instanceof MethodDeclaration) {
+				System.out.println(variable.getName() + "の寿命が長い(" + lifespan + "行)");
+			}
+		}
+		System.out.println();
+		for(MethodDeclaration method : visitor.getMethodList()) {
+			int line = (int)method.getProperty(MyVisitor.LINE_COUNT);
+			if(line > 15) {
+				System.out.println(method.getName() + "の行数が長い(" + line + "行)");
+			}
+			int mcCabe = (int)method.getProperty(MyVisitor.CYCLOMATIC_COMPLEXITY);
+			if(mcCabe > 10) {
+				System.out.println(method.getName() + "のサイクロマチック数が大きい(" + mcCabe + ")");
+			}
 		}
 	}
-
 }
