@@ -1,14 +1,20 @@
 package codeanalizer;
 
+import static java.util.Comparator.comparing;
+
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.dom.*;
 
 public class CodeAnalizer {
+	private static final int THRESHOLD_OF_LINE_COUNT_OF_METHOD = 15;
+	private static final int THRESHOLD_OF_CYCLOMATIC_CONPLEXITY = 10;
+	private static final int THRESHOLD_OF_LIFE_SPAN = 15;
 
 	public static void main(String args[]) {
-		new CodeAnalizer().run("src/codeanalizer/");
+		new CodeAnalizer().run("res/");
+		// new CodeAnalizer().run("src/codeanalizer/");
 	}
 
 	public void run(String pathToPackage) {
@@ -17,27 +23,34 @@ public class CodeAnalizer {
 
 		for(String className : classList) {
 			System.out.println("\n" + className + "\n");
+			run(pathToPackage, className);
+		}
+	}
 
-			String rawCode = FileUtil.readSourceCode(pathToPackage + className);
+	public void run(String pathToPackage, String className) {
+		String rawCode = FileUtil.readSourceCode(pathToPackage + className);
 
-			if(rawCode == null) continue;
+		if(rawCode == null) return;
 
-			String formattedCode = MyParser.format(rawCode);
+		String formattedCode = MyParser.format(rawCode);
 
-			ASTParser parser = ASTParser.newParser(AST.JLS4);
-			parser.setSource(formattedCode.toCharArray());
-			CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
+		ASTParser parser = ASTParser.newParser(AST.JLS4);
+		parser.setSource(formattedCode.toCharArray());
+		CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
 
-			MyVisitor visitor = new MyVisitor(formattedCode);
-			unit.accept(visitor);
+		MyVisitor visitor = new MyVisitor(formattedCode);
+		unit.accept(visitor);
 
-			setLineNum(visitor, rawCode);
-
+		setLineNum(visitor, rawCode);
+		/*
 			printMethodDetail(unit, formattedCode);
 			printVariableDetail(unit, formattedCode);
+		 */
 
-			System.out.println("Cyclomatic complexity: " + visitor.totalCyclomaticComplexity());
-		}
+		showWarning(unit, formattedCode);
+
+		// System.out.println("Cyclomatic complexity: " +
+		// visitor.totalCyclomaticComplexity());
 	}
 
 	private static void printMethodDetail(CompilationUnit unit, String code) {
@@ -96,9 +109,35 @@ public class CodeAnalizer {
 	void showWarning(CompilationUnit unit, String code) {
 		MyVisitor visitor = new MyVisitor(code);
 		unit.accept(visitor);
-		for(VariableDeclarationFragment variable : visitor.getVariableList()) {
 
-		}
+		visitor.getVariableList().stream()
+				.filter(v -> (v.getProperty(MyVisitor.DEFINITION_PLACE) instanceof MethodDeclaration)
+						&& lifeSpanOf(v) > THRESHOLD_OF_LIFE_SPAN)
+				.sorted(comparing(CodeAnalizer::lifeSpanOf).reversed())
+				.forEach(variable -> System.out.println(variable.getName() + "の寿命が長い(" + lifeSpanOf(variable) + "行)"));
+
+		System.out.println();
+
+		visitor.getMethodList().stream().filter(m -> lineCountOf(m) > THRESHOLD_OF_LINE_COUNT_OF_METHOD)
+				.sorted(comparing(CodeAnalizer::lineCountOf).reversed())
+				.forEach(m -> System.out.println(m.getName() + "の行数が長い(" + lineCountOf(m) + "行)"));
+
+		System.out.println();
+
+		visitor.getMethodList().stream().filter(m -> cyclomaticComplexityOf(m) > THRESHOLD_OF_CYCLOMATIC_CONPLEXITY)
+				.sorted(comparing(CodeAnalizer::cyclomaticComplexityOf).reversed())
+				.forEach(m -> System.out.println(m.getName() + "のサイクロマチック数が大きい(" + cyclomaticComplexityOf(m) + ")"));
 	}
 
+	private static int lineCountOf(MethodDeclaration method) {
+		return (int) method.getProperty(MyVisitor.LINE_COUNT);
+	}
+
+	private static int cyclomaticComplexityOf(MethodDeclaration method) {
+		return (int) method.getProperty(MyVisitor.CYCLOMATIC_COMPLEXITY);
+	}
+
+	private static int lifeSpanOf(VariableDeclarationFragment variable) {
+		return (int) variable.getProperty(MyVisitor.LIFE_SPAN);
+	}
 }
