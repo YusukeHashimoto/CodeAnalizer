@@ -120,7 +120,7 @@ public class MyVisitor extends ASTVisitor {
 		return cyclomaticComplexity;
 	}
 
-	MethodDeclaration parentMethodOf(ASTNode node) {
+	private MethodDeclaration parentMethodOf(ASTNode node) {
 		ASTNode parent = node.getParent();
 		while(!(parent instanceof MethodDeclaration)) {
 			parent = parent.getParent();
@@ -129,7 +129,7 @@ public class MyVisitor extends ASTVisitor {
 		return (MethodDeclaration) parent;
 	}
 
-	void increaseCC(MethodDeclaration node) {
+	private void increaseCC(MethodDeclaration node) {
 		node.setProperty(CYCLOMATIC_COMPLEXITY, (Integer) node.getProperty(CYCLOMATIC_COMPLEXITY) + 1);
 	}
 

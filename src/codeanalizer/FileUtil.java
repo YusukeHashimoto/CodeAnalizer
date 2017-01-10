@@ -1,19 +1,19 @@
 package codeanalizer;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class FileUtil {
+
 	static String readSourceCode(String path) {
-		try {
-			FileReader fr = new FileReader(new File(path));
-			BufferedReader br = new BufferedReader(fr);
+		try(Stream<String> lines = Files.lines(Paths.get(path))) {
 			StringBuilder sb = new StringBuilder();
-
-			br.lines().forEach(s -> sb.append(s).append('\n'));
-
-			br.close();
+			lines.forEach(s -> sb.append(s).append('\n'));
 			return sb.toString();
 		} catch(IOException e) {
 			System.err.println(e);

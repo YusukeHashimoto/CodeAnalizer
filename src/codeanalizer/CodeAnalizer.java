@@ -65,9 +65,14 @@ public class CodeAnalizer {
 				System.out.printf("変数名   =%s%n", variable.getName().getIdentifier());
 				System.out.printf("開始行 =%s%n", variable.getProperty(MyVisitor.DECLARED_LINE));
 				System.out.printf("初期化子  =%s%n", variable.getInitializer());
-				System.out.printf("寿命=%s%n", variable.getProperty(MyVisitor.LIFE_SPAN));
-				System.out.println(variable.getProperty(MyVisitor.DEFINITION_PLACE) instanceof MethodDeclaration
-						? "ローカル変数" : "フィールド変数");
+
+				if(variable.getProperty(MyVisitor.DEFINITION_PLACE) instanceof MethodDeclaration) {
+					System.out.println("ローカル変数");
+					System.out.printf("寿命=%s%n", variable.getProperty(MyVisitor.LIFE_SPAN));
+				} else {
+					System.out.println("フィールド変数");
+				}
+
 				System.out.println();
 			}
 		}
