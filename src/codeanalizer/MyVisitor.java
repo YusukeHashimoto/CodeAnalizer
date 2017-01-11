@@ -62,28 +62,28 @@ public class MyVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(IfStatement node) {
 		cyclomaticComplexity++;
-		increaseCC(parentMethodOf(node));
+		incrementCC(parentMethodOf(node));
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(SwitchCase node) {
 		cyclomaticComplexity++;
-		increaseCC(parentMethodOf(node));
+		incrementCC(parentMethodOf(node));
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(WhileStatement node) {
 		cyclomaticComplexity++;
-		increaseCC(parentMethodOf(node));
+		incrementCC(parentMethodOf(node));
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(ForStatement node) {
 		cyclomaticComplexity++;
-		increaseCC(parentMethodOf(node));
+		incrementCC(parentMethodOf(node));
 		return super.visit(node);
 
 	}
@@ -91,32 +91,31 @@ public class MyVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(CatchClause node) {
 		cyclomaticComplexity++;
-		increaseCC(parentMethodOf(node));
+		incrementCC(parentMethodOf(node));
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(EnhancedForStatement node) {
 		cyclomaticComplexity++;
-		increaseCC(parentMethodOf(node));
+		incrementCC(parentMethodOf(node));
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(ConditionalExpression node) {
 		cyclomaticComplexity++;
-		increaseCC(parentMethodOf(node));
+		incrementCC(parentMethodOf(node));
 		return super.visit(node);
-	}//org.eclipse.jdt.core.dom.
-	
+	}// org.eclipse.jdt.core.dom.
+
 	@Override
 	public boolean visit(InfixExpression node) {
 		InfixExpression.Operator operator = node.getOperator();
-		if(operator == InfixExpression.Operator.CONDITIONAL_AND ||
-				operator == InfixExpression.Operator.CONDITIONAL_OR) {
+		if(operator == InfixExpression.Operator.CONDITIONAL_AND
+				|| operator == InfixExpression.Operator.CONDITIONAL_OR) {
 			cyclomaticComplexity++;
-			increaseCC(parentMethodOf(node));
-			
+			incrementCC(parentMethodOf(node));
 		}
 		return super.visit(node);
 	}
@@ -124,10 +123,10 @@ public class MyVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(DoStatement node) {
 		cyclomaticComplexity++;
-		increaseCC(parentMethodOf(node));
+		incrementCC(parentMethodOf(node));
 		return super.visit(node);
 	}
-	
+
 	int totalCyclomaticComplexity() {
 		return cyclomaticComplexity;
 	}
@@ -141,7 +140,7 @@ public class MyVisitor extends ASTVisitor {
 		return (MethodDeclaration) parent;
 	}
 
-	private void increaseCC(MethodDeclaration node) {
+	private void incrementCC(MethodDeclaration node) {
 		node.setProperty(CYCLOMATIC_COMPLEXITY, (Integer) node.getProperty(CYCLOMATIC_COMPLEXITY) + 1);
 	}
 

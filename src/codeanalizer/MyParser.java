@@ -1,7 +1,7 @@
 package codeanalizer;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -57,10 +57,8 @@ public class MyParser {
 	 * @return
 	 */
 	static String removeMatchedLine(String code, String regex) {
-		List<String> lines = Arrays.asList(code.split("\n"));
-		StringBuilder sb = new StringBuilder();
-		lines.stream().filter(s -> !s.matches(regex)).forEach(s -> sb.append(s + '\n'));
-		return sb.toString();
+		return Arrays.asList(code.split("\n")).stream().filter(s -> !s.matches(regex))
+				.collect(Collectors.joining("\n"));
 	}
 
 	/**

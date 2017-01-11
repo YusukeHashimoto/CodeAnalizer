@@ -6,15 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public class FileUtil {
 
 	static String readSourceCode(String path) {
-		try(Stream<String> lines = Files.lines(Paths.get(path))) {
-			StringBuilder sb = new StringBuilder();
-			lines.forEach(s -> sb.append(s).append('\n'));
-			return sb.toString();
+		try {
+			return Files.lines(Paths.get(path)).collect(Collectors.joining("\n"));
 		} catch(IOException e) {
 			System.err.println(e);
 			return null;
